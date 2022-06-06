@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const userValidator = require('./user.validator')
 const Joi = require('joi');
 const mongoose = require('mongoose');
+const nodemailer = require("nodemailer");
 
 exports.login = async (req, res) => {
   try {
@@ -45,7 +46,7 @@ exports.register = async (req, res) => {
     if (validateResult.error) {
       throw validateResult.error.message;
     } else {
-      const oldUser = await User.findOne({ username, email });
+      const oldUser = await User.findOne({ username: username, email:email });
       if (oldUser) {
         throw "User already registerd";
       } else {
@@ -53,7 +54,7 @@ exports.register = async (req, res) => {
         const user = await User.create({
           firstname: firstname,
           lastname: lastname,
-          username: lastname,
+          username: username,
           email: String(email).toLowerCase(),
           password: encryptedPassword,
           gender: gender,
@@ -64,16 +65,41 @@ exports.register = async (req, res) => {
           { user_id: user._id, username },
           process.env.TOKEN_KEY,
           {
-            expiresIn: "2h",
+            expiresIn: "365d",
           }
         );
   
         user.token = token;
-        res.status(200).json(user);
+        let transporter = nodemailer.createTransport({
+          service: 'gmail',
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: true,
+          auth: {
+            user: process.env.GMAIL_ID,
+            pass: process.env.GMAIL_PASSWORD
+          }, tls: {
+            rejectUnauthorized: false
+          }
+        });
+        
+        transporter.sendMail({
+          from: process.env.GMAIL_ID,
+          to: user.email,
+          subject: `${user.username} your registration completed`,
+          text: `Hello ${user.username}, Welcome to our nodejs world`,
+          html: `<b>Hello ${user.username},</b></n> Welcome to our nodejs world </b>`
+        },function(err, response) {
+          if (err) {
+            console.log(err);
+          }
+          res.status(200).json(user);
+        });
       }
     }
   } catch (err) {
-    res.status(400).send(err);
+    console.log(err.message)
+    res.status(400).send(err.message);
   }
 }
 exports.update = async (req, res) => {
