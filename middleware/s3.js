@@ -5,19 +5,18 @@ const multers3 = require("multer-s3");
 const userController = require('../controller/userController');
 const productController = require('../controller/product.controller');
 
-const {_id} = req.query;
-  const bucket = process.env.AWS_BUCKET_NAME
-  const region = process.env.AWS_BUCKET_REGION
-  const accessKey = process.env.AWS_ACCESS_KEY
-  const secretKey = process.env.AWS_SECRET_KEY
+const bucket = process.env.AWS_BUCKET_NAME
+const region = process.env.AWS_BUCKET_REGION
+const accessKey = process.env.AWS_ACCESS_KEY
+const secretKey = process.env.AWS_SECRET_KEY
   
-  const s3 = new S3({
-      region,
-      credentials: {
-          accessKeyId: accessKey,
-          secretAccessKey: secretKey
-      }
-  })
+const s3 = new S3({
+    region,
+    credentials: {
+        accessKeyId: accessKey,
+        secretAccessKey: secretKey
+    }
+})
 
 exports.s3FileUpload = async (req, res) => {
     const {_id} = req.query;
