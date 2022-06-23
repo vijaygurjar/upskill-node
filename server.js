@@ -13,7 +13,6 @@ const userController = require('./controller/user.controller');
 const productController = require('./controller/product.controller');
 const passport = require('passport');
 const session = require('express-session');
-const OAuth2Data = require('./config/credential.json')
 const tokenSchema = require('./model/token');
 
 // setup route middlewares
@@ -64,11 +63,11 @@ app.post('/csrf', parseForm, csrfProtection, function (req, res) {
 })
 
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-
+console.log(process.env.GOOGLE_CLIENT)
 passport.use(new GoogleStrategy({
-        clientID: OAuth2Data.client.id,
-        clientSecret: OAuth2Data.client.secret,
-        callbackURL: OAuth2Data.client.redirect
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_SECRET,
+        callbackURL: process.env.GOOGLE_REDIRECT
     },
     async (accessToken, refreshToken, profile, done) => {
         const newUser = {
