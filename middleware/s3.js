@@ -2,7 +2,7 @@ const S3 = require('aws-sdk/clients/s3');
 const fs = require("fs");
 const multer = require("multer");
 const multers3 = require("multer-s3");
-const userController = require('../controller/userController');
+const userController = require('../controller/user.controller');
 const productController = require('../controller/product.controller');
 
 const bucket = process.env.AWS_BUCKET_NAME
@@ -24,6 +24,7 @@ exports.s3FileUpload = async (req, res) => {
         storage: multers3({
             s3: s3,
             bucket: bucket,
+            acl: 'public-read',
             key: function (req, file, cb) {
                 cb(null, file.originalname); //use Date.now() for unique file keys
             }
@@ -42,10 +43,12 @@ exports.s3FileUpload = async (req, res) => {
 }
 
 exports.s3ProductPicUpload = async (req, res) => {
+  const {_id} = req.query;
   const uploadProductPicS3 = multer({
       storage: multers3({
           s3: s3,
           bucket: bucket,
+          ACL: 'public-read',
           key: function (req, file, cb) {
               cb(null, file.originalname); //use Date.now() for unique file keys
           }
@@ -59,31 +62,6 @@ exports.s3ProductPicUpload = async (req, res) => {
               _id: _id, url: req.file.location, name: req.file.key, type: req.file.mimetype, size: req.file.size
           }
           productController.uploadProductPic(resData, res)
-      }
-  })
-}
-
-exports.s3ProductAssetsUpload = async (req, res) => {
-  const {_id} = req.query;
-  const uploadProductAssetsS3 = multer({
-      storage: multers3({
-          s3: s3,
-          bucket: bucket,
-          key: function (req, file, cb) {
-              cb(null, file.originalname); //use Date.now() for unique file keys
-          }
-      })
-  }).array('files')
-  uploadProductAssetsS3(req , res, (err)=> {
-      if (err) {
-          res.send("Error in file uploading");
-      } else {
-        let fileArray = req.files;
-        const images = [];
-        for (let i = 0; i < fileArray.length; i++) {
-            images.push(fileArray[i].originalname)
-        }
-        productController.uploadProductAssets(images, res)
       }
   })
 }

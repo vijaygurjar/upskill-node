@@ -19,15 +19,9 @@ const productValidator = Joi.object({
       });
       return errors;
     }),
-    type: Joi.string().min(3).max(25).required().error(errors => {
+    type: Joi.string().max(25).error(errors => {
       errors.forEach(err => {
         switch (err.code) {
-          case "string.empty":
-            err.message = "Last name should not be empty!";
-            break;
-          case "string.min":
-            err.message = `Last name should have at least ${err.local.limit} characters!`;
-            break;
           case "string.max":
             err.message = `Last name should have at most ${err.local.limit} characters!`;
             break;
@@ -38,9 +32,10 @@ const productValidator = Joi.object({
       return errors;
     }),
     description: Joi.string(),
-    filename: Joi.string(),
+    pic: Joi.string(),
     price: Joi.number().default(0),
     rating: Joi.number().default(0),
+    stock: Joi.number().default(0),
     status: Joi.boolean().default(true)
 })
 module.exports = productValidator;
