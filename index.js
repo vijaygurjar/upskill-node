@@ -1,5 +1,5 @@
 const http = require("http");
-const app = require("./app");
+const app = require("./server");
 const bodyParser = require('body-parser')
 
 // create application/json parser
