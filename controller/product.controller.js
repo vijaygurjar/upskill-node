@@ -78,3 +78,15 @@ exports.uploadProductPic = async (req, res) => {
     res.status(400).send(error);
   }
 }
+
+exports.uploadProductPics = async (req, res) => {
+  try {
+    const { _id, images } = req;
+    var query = { '_id': mongoose.Types.ObjectId(_id) };
+    var newData = { images: images };
+    const productUpdate = await Product.findOneAndUpdate(query, { $set: newData }, { new: true });
+    res.status(200).send({ "message": 'success', 'images': images });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+}
