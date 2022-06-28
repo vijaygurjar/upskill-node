@@ -1,11 +1,11 @@
-require("dotenv").config();
-const request = require("supertest");
-const app = require('../routes/routes');
-let token;
-let userId;
-let userData;
-let productSample;
-let productId;
+require("dotenv").config()
+const request = require("supertest")
+const app = require('../routes/routes')
+let token,
+userId,
+userData,
+productSample,
+productId
 
 describe("Register user", () => {
   it("should register user", async () => {

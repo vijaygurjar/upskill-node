@@ -1,19 +1,19 @@
-require("dotenv").config();
-var cookieParser = require('cookie-parser');
-var csrf = require('csurf');
-const express = require('express');
-const db = require('../config/database').connect();
-const User = require('../model/user');
+require("dotenv").config()
+var cookieParser = require('cookie-parser')
+var csrf = require('csurf')
+const express = require('express')
+const db = require('../config/database').connect()
+const User = require('../model/user')
 const bodyParser = require('body-parser')
-const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken")
 
-const auth = require('../middleware/auth');
-const { s3FileUpload, s3ProductPicUpload} = require('../middleware/s3');
+const auth = require('../middleware/auth')
+const { s3FileUpload, s3ProductPicUpload, s3ProductPicsUpload } = require('../controller/s3')
 const userController = require('../controller/user.controller');
-const productController = require('../controller/product.controller');
-const passport = require('passport');
-const session = require('express-session');
-const tokenSchema = require('../model/token');
+const productController = require('../controller/product.controller')
+const passport = require('passport')
+const session = require('express-session')
+const tokenSchema = require('../model/token')
 
 // setup route middlewares
 var csrfProtection = csrf({ cookie: true })
@@ -55,7 +55,7 @@ app.get('/csrf', csrfProtection, function (req, res) {
     console.log('to browser',csrftoken);
 })
 
-app.post('/csrf', parseForm, csrfProtection, function (req, res) {
+app.post('/transfer', parseForm, csrfProtection, function (req, res) {
   console.log('from browser:',req.body._csrf)
   res.send("OK")
 })
@@ -144,7 +144,7 @@ app.put("/api/user/update", userController.update);
 
 app.delete("/api/user/remove", userController.remove);
 
-app.post("/api/user/uploadavtar", s3FileUpload)
+app.post("/api/user/uploadavtar", s3FileUpload);
 
 app.post('/api/product/add', productController.add);
 
@@ -152,7 +152,8 @@ app.put("/api/product/update", productController.update);
 
 app.delete("/api/product/remove", productController.remove);
 
-app.post("/api/product/uploadpic", s3ProductPicUpload)
+app.post("/api/product/uploadpic", s3ProductPicUpload);
+app.post("/api/product/uploadpics", s3ProductPicsUpload);
 
 app.get("/api/product/all", productController.getAll);
 

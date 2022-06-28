@@ -5,13 +5,13 @@ const productValidator = Joi.object({
       errors.forEach(err => {
         switch (err.code) {
           case "string.empty":
-            err.message = "First name should not be empty!";
+            err.message = "Product title should not be empty!";
             break;
           case "string.min":
-            err.message = `First name should have at least ${err.local.limit} characters!`;
+            err.message = `Product title should have at least ${err.local.limit} characters!`;
             break;
           case "string.max":
-            err.message = `First name should have at most ${err.local.limit} characters!`;
+            err.message = `Product title should have at most ${err.local.limit} characters!`;
             break;
           default:
             break;
@@ -23,7 +23,7 @@ const productValidator = Joi.object({
       errors.forEach(err => {
         switch (err.code) {
           case "string.max":
-            err.message = `Last name should have at most ${err.local.limit} characters!`;
+            err.message = `Product type should have at most ${err.local.limit} characters!`;
             break;
           default:
             break;

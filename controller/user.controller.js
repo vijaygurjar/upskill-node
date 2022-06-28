@@ -1,10 +1,10 @@
-const bcrypt = require("bcryptjs");
-const User = require('../model/user');
-const tokenSchema = require('../model/token');
-const jwt = require("jsonwebtoken");
-const {userValidator, loginValidator, logoutValidator, userUpdateValidator} = require('../validator/user.validator');
-const mongoose = require('mongoose');
-const nodemailer = require("nodemailer");
+const bcrypt = require("bcryptjs")
+const User = require('../model/user')
+const tokenSchema = require('../model/token')
+const jwt = require("jsonwebtoken")
+const {userValidator, loginValidator, logoutValidator, userUpdateValidator} = require('../validator/user.validator')
+const mongoose = require('mongoose')
+const nodemailer = require("nodemailer")
 
 exports.register = async (req, res) => {
   try {
