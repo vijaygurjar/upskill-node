@@ -117,20 +117,11 @@ const loginValidator = Joi.object({
 })
 
 const logoutValidator = Joi.object({
-  email: Joi.string().email().trim(true).required().error(errors => {
+  _id: Joi.string().required().error(errors => {
     errors.forEach(err => {
       switch (err.code) {
-        case "string.email":
-          err.message = "Email id is not valid!";
-          break;
         case "string.empty":
-          err.message = "Email id should not be empty!";
-          break;
-        case "string.min":
-          err.message = `Email id should have at least ${err.local.limit} characters!`;
-          break;
-        case "string.max":
-          err.message = `Email id should have at most ${err.local.limit} characters!`;
+          err.message = "user id should not be empty!";
           break;
         default:
           break;

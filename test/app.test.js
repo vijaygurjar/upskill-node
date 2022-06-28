@@ -1,8 +1,6 @@
 require("dotenv").config();
-const express = require("express");
 const request = require("supertest");
-const app = require('./server');
-const userController = require('./controller/user.controller');
+const app = require('../routes/routes');
 let token;
 let userId;
 let userData;

@@ -1,5 +1,5 @@
 const Product = require('../model/product');
-const productValidator = require('./product.validator')
+const productValidator = require('../validator/product.validator');
 const mongoose = require('mongoose');
 
 exports.add = async (req, res) => {
