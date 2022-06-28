@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require('../model/user');
 const tokenSchema = require('../model/token');
 const jwt = require("jsonwebtoken");
-const {userValidator, loginValidator, logoutValidator, userUpdateValidator} = require('./user.validator')
+const {userValidator, loginValidator, logoutValidator, userUpdateValidator} = require('../validator/user.validator');
 const mongoose = require('mongoose');
 const nodemailer = require("nodemailer");
 
@@ -88,9 +88,8 @@ exports.login = async (req, res) => {
         var query = { '_id': user._id };
         var newData = { token : token};
 
-        await User.findOneAndUpdate(query, { $set: newData }, { new: true });
         await tokenSchema.findOneAndUpdate(query, { $set: newData }, { new: true });
-        res.status(200).json({ _id: user._id, email: user.email, gender: user.gender, pic: user.pic , token: token});
+        res.status(200).json({ _id: user._id, name: user.firstname + ' ' + user.lastname, email: user.email, gender: user.gender, pic: user.pic, token: token});
         
       } else {
         throw {message: "email or password missmatch"};
@@ -103,12 +102,12 @@ exports.login = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    const { _id } = req.query
-    const validateResult = loginValidator.validate(req.body);
+    const { _id } = req.body;
+    const validateResult = logoutValidator.validate(req.body);
     if (validateResult.error) {
       throw validateResult.error;
     } else {
-      userToken.deleteOne({ _id: _id }, function (err) {
+        tokenSchema.deleteOne({ _id: _id }, function (err) {
         if (!err) {
           res.status(200).send('logged out');
         } else {
