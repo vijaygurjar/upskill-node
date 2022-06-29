@@ -21,7 +21,7 @@ var parseForm = bodyParser.urlencoded({ extended: false })
 
 const app = express();
 
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: false }));
 
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
