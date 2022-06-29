@@ -57,8 +57,8 @@ exports.register = async (req, res) => {
           from: process.env.EMAIL_AUTH_USER_EMAIL,
           to: user.email,
           subject: 'Sending Email using Node.js',
-          text: `Hello ${user.email}, Welcome to our nodejs world`,
-          html: `<b>Hello ${user.email},</b></n> Welcome to our nodejs world </b>`
+          text: `Hello ${user.firstname || user.email}, Welcome to our nodejs world`,
+          html: `<b>Hello ${user.firstname || user.email},</b><br> Welcome to our nodejs world </b>`
         },function(err, response) {
           if (err) {
             console.log(err);

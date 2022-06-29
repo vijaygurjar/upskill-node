@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const userValidator = Joi.object({
-    firstname: Joi.string().alphanum().max(25).default('abc').error(errors => {
+    firstname: Joi.string().alphanum().min(3).max(25).default('guest').error(errors => {
       errors.forEach(err => {
         switch (err.code) {
           case "string.max":
@@ -13,7 +13,7 @@ const userValidator = Joi.object({
       });
       return errors;
     }),
-    lastname: Joi.string().alphanum().max(25).default('xyz').error(errors => {
+    lastname: Joi.string().alphanum().min(3).max(25).default('xyz').error(errors => {
       errors.forEach(err => {
         switch (err.code) {
           case "string.max":
@@ -121,7 +121,7 @@ const logoutValidator = Joi.object({
     errors.forEach(err => {
       switch (err.code) {
         case "string.empty":
-          err.message = "user id should not be empty!";
+          err.message = "User id should not be empty!";
           break;
         default:
           break;
