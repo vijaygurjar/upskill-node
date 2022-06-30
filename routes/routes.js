@@ -1,32 +1,22 @@
 require("dotenv").config()
-var cookieParser = require('cookie-parser')
-var csrf = require('csurf')
 const express = require('express')
+const passport = require('passport')
+const session = require('express-session')
 const db = require('../config/database').connect()
 const User = require('../model/user')
-const bodyParser = require('body-parser')
 const jwt = require("jsonwebtoken")
-
 const auth = require('../middleware/auth')
 const { s3FileUpload, s3ProductPicUpload, s3ProductPicsUpload } = require('../controller/s3')
 const userController = require('../controller/user.controller');
 const productController = require('../controller/product.controller')
-const passport = require('passport')
-const session = require('express-session')
 const tokenSchema = require('../model/token')
-
-// setup route middlewares
-var csrfProtection = csrf({ cookie: true })
-var parseForm = bodyParser.urlencoded({ extended: false })
 
 const app = express();
 
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
-
-app.set('view engine', 'ejs');
 
 app.use(session({
   resave: false,
@@ -36,29 +26,6 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(cookieParser())
-
-//Security call for learning
-app.get('/csrf', csrfProtection, function (req, res) {
-  // pass the csrfToken to the view
-  let csrftoken = req.csrfToken();
-  res.send(`
-    <html>
-    <form id="myForm" action="/transfer" method="POST" target="_self">
-    Account:<input type="text" name="account" value="your friend"/><br/>
-    Amount:<input type="text" name="amount" value="$5000"/>
-    <input type="hidden" name="_csrf" value="${csrftoken}"/>
-      <button type="submit">Transfer Money</button>
-    </form>
-    </html>
-    `)
-    console.log('to browser',csrftoken);
-})
-
-app.post('/transfer', parseForm, csrfProtection, function (req, res) {
-  console.log('from browser:',req.body._csrf)
-  res.send("OK")
-})
 
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 passport.use(new GoogleStrategy({
@@ -153,6 +120,7 @@ app.put("/api/product/update", productController.update);
 app.delete("/api/product/remove", productController.remove);
 
 app.post("/api/product/uploadpic", s3ProductPicUpload);
+
 app.post("/api/product/uploadpics", s3ProductPicsUpload);
 
 app.get("/api/product/all", productController.getAll);

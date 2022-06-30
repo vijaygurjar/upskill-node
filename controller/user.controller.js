@@ -3,20 +3,20 @@ const User = require('../model/user')
 const tokenSchema = require('../model/token')
 const jwt = require("jsonwebtoken")
 const {userValidator, loginValidator, logoutValidator, userUpdateValidator} = require('../validator/user.validator')
-const mongoose = require('mongoose')
+
 const nodemailer = require("nodemailer")
 
 exports.register = async (req, res) => {
   try {
     const { firstname, lastname, email, password, gender, status } = req.body;
-    const validateResult = userValidator.validate(req.body);
+    const validateResult = userValidator.validate({ firstname, lastname, email, password, gender, status });
     
     if (validateResult.error) {
       throw validateResult.error;
     } else {
-      const oldUser = await User.findOne({ email:email });
-      if (oldUser) {
-        throw {message: "User already registerd"};
+      const existingUser = await User.findOne({ email: String(email).toLowerCase() });
+      if (existingUser) {
+        throw {message: "User already registerd!"};
       } else {
         const encryptedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({
@@ -42,7 +42,7 @@ exports.register = async (req, res) => {
         
          let transporter = nodemailer.createTransport({
           host: process.env.EMAIL_HOST,
-          port: 465,
+          port: process.env.EMAIL_PORT,
           secure: true,
           auth: {
             user: process.env.EMAIL_AUTH_USER_EMAIL,
@@ -67,7 +67,7 @@ exports.register = async (req, res) => {
       }
     }
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).send(err.message);
   }
 }
 
@@ -88,9 +88,8 @@ exports.login = async (req, res) => {
         var query = { '_id': user._id };
         var newData = { token : token};
 
-        await tokenSchema.findOneAndUpdate(query, { $set: newData }, { new: true });
+        await tokenSchema.findOneAndUpdate(query, { $set: newData }, { upsert: true});
         res.status(200).json({ _id: user._id, name: user.firstname + ' ' + user.lastname, email: user.email, gender: user.gender, pic: user.pic, token: token});
-        
       } else {
         throw {message: "email or password missmatch"};
       }
@@ -102,14 +101,17 @@ exports.login = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    const { _id } = req.body;
+    const _id = req.body._id || req.query._id || req.headers["_id"];
+    if (_id === undefined) {
+      throw {message: "User id required!"};
+    }
     const validateResult = logoutValidator.validate(req.body);
     if (validateResult.error) {
       throw validateResult.error;
     } else {
         tokenSchema.deleteOne({ _id: _id }, function (err) {
         if (!err) {
-          res.status(200).send('logged out');
+          res.status(200).send({"message": "success"});
         } else {
           throw err;
         }
@@ -123,31 +125,37 @@ exports.logout = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { firstname, lastname, gender, status } = req.body;
-    const { _id } = req.query
-    const validateResult = userUpdateValidator.validate(req.body);
+    const _id = req.body._id || req.query._id || req.headers["_id"];
+    if (_id === undefined) {
+      throw {message: "User already registerd!"};
+    }
+    const validateResult = userUpdateValidator.validate({firstname, lastname, gender, status});
     if (validateResult.error) {
       throw validateResult.error.message;
     } else {
-      var query = { '_id': mongoose.Types.ObjectId(_id) };
+      var query = { '_id': _id };
       var newData = { firstname: firstname, lastname: lastname, gender: gender, status: status };
 
       await User.findOneAndUpdate(query, { $set: newData }, { new: true })
       res.status(200).json({"message": "success"});
     }
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.message);
   }
 }
 
 exports.remove = async (req, res) => {
   try {
-    const { _id } = req.query;
+    const _id = req.body._id || req.query._id || req.headers["_id"];
+    if (_id === undefined) {
+      throw {message: "User id required!"};
+    }
     await User.deleteOne({ _id: _id });
     await tokenSchema.deleteOne({ _id: _id });
     res.status(200).json({'message': 'success'});
   } catch (error) {
     console.log('remove:' ,error)
-    res.status(400).send(error);
+    res.status(400).send(error.message);
   }
 }
 
@@ -156,30 +164,18 @@ exports.getAll = async (req, res) => {
     const users = await User.find();
     res.status(200).json(users);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.message);
   }
 }
 
 exports.uploadAvtar = async (req, res) => {
   try {
     const { name, _id, url } = req;
-    var query = { '_id': mongoose.Types.ObjectId(_id) };
+    var query = { '_id': _id };
     var newData = { pic: name };
     await User.findOneAndUpdate(query, { $set: newData }, { new: true })
-    res.status(200).send({ "message": 'success', file: 'name', url: url });
+    res.status(200).send({ "message": 'success', file: name, url: url });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.message);
   }
-}
-
-exports.tokenGenerate = async (req, res) => {
-  let _id = '62a9aa214a1035419e8257e8';
-  const token = jwt.sign(
-    { email: 'test@test.com' }, process.env.TOKEN_KEY, { expiresIn: "2h"}
-  );
-  var query = { '_id': _id };
-  var newData = { token : token};
-  await tokenSchema.findOneAndUpdate(query, { $set: newData }, { new: true });
-  
-  return token;
 }
