@@ -1,5 +1,4 @@
 const S3 = require('aws-sdk/clients/s3');
-const fs = require("fs");
 const multer = require("multer");
 const multers3 = require("multer-s3");
 const userController = require('./user.controller');
@@ -19,7 +18,7 @@ const s3 = new S3({
 })
 
 exports.s3FileUpload = async (req, res) => {
-    const {_id} = req.query;
+    const _id = req.body._id || req.query._id || req.headers["_id"];
     const uploadS3Test = multer({
         storage: multers3({
             s3: s3,
@@ -34,16 +33,20 @@ exports.s3FileUpload = async (req, res) => {
         if (err) {
             res.send("Error in file uploading");
         } else {
+          if (req.file === undefined) {
+            res.status(400).send({'message': 'error in file uploading'}); 
+          } else {
             const resData = {
                 _id: _id, url: req.file.location, name: req.file.key, type: req.file.mimetype, size: req.file.size
             }
             userController.uploadAvtar(resData, res)
+          }
         }
     })
 }
 
 exports.s3ProductPicUpload = async (req, res) => {
-  const {_id} = req.query;
+  const _id = req.body._id || req.query._id || req.headers["_id"];
   const uploadProductPicS3 = multer({
       storage: multers3({
           s3: s3,
@@ -58,23 +61,27 @@ exports.s3ProductPicUpload = async (req, res) => {
       if (err) {
           res.send("Error in file uploading");
       } else {
+        if (req.file === undefined) {
+          res.status(400).send({'message': 'error in file uploading'}); 
+        } else {
           const resData = {
               _id: _id, url: req.file.location, name: req.file.key, type: req.file.mimetype, size: req.file.size
           }
           productController.uploadProductPic(resData, res)
+        }
       }
   })
 }
 
 exports.s3ProductPicsUpload = async (req, res) => {
-  const {_id} = req.query;
+  const _id = req.body._id || req.query._id || req.headers["_id"];
   const uploadProductPicsS3 = multer({
       storage: multers3({
           s3: s3,
           bucket: bucket,
           ACL: 'public-read',
           key: function (req, file, cb) {
-              cb(null, file.originalname); //use Date.now() for unique file keys
+              cb(null, file.originalname);
           }
       })
   }).array('files')
@@ -82,26 +89,20 @@ exports.s3ProductPicsUpload = async (req, res) => {
       if (err) {
           res.send("Error in file uploading");
       } else {
-        let fileArray = req.files;
-        const resData = {_id: _id};
-        const images = [];
-        for (let i = 0; i < fileArray.length; i++) {
-          images.push({name: fileArray[i].key, type: fileArray[i].mimetype})
+        if (req.files === undefined) {
+          res.status(400).send({'message': 'error in file uploading'}); 
+        } else {
+          let fileArray = req.files;
+          const resData = {_id: _id};
+          const images = [];
+          for (let i = 0; i < fileArray.length; i++) {
+            images.push({name: fileArray[i].key, type: fileArray[i].mimetype})
+          }
+          resData.images = images;
+          
+          productController.uploadProductPics(resData, res)
         }
-        resData.images = images;
-        // Save the file name into database
         
-        productController.uploadProductPics(resData, res)
-        // return res.status(200).json({
-        //     status: 'ok',
-        //     filesArray: fileArray,
-        //     locationArray: images
-        //   });
-
-        //   const resData = {
-        //       _id: _id, url: req.file.location, name: req.file.key, type: req.file.mimetype, size: req.file.size
-        //   }
-        //   productController.uploadProductPic(resData, res)
       }
   })
 }

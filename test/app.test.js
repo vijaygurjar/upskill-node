@@ -118,9 +118,9 @@ describe("add product", () => {
     .query({
       token: token
      })
-     productId = res.body._id;
+     productId = res.body.product._id;
      
-     expect(res.body).toHaveProperty('_id')
+     expect(res.body).toHaveProperty('product')
   });
 });
 
@@ -135,7 +135,7 @@ describe("update product", () => {
       stock: 100,
       status: false
     }
-    const result = {'message': 'success'}
+    const result = { "message": "success" }
     const res = await request(app).put("/api/product/update")
     .send(productSample)
     .query({
