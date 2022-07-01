@@ -127,7 +127,7 @@ exports.update = async (req, res) => {
     const { firstname, lastname, gender, status } = req.body;
     const _id = req.body._id || req.query._id || req.headers["_id"];
     if (_id === undefined) {
-      throw {message: "User already registerd!"};
+      throw {message: "User id required!"};
     }
     const validateResult = userUpdateValidator.validate({firstname, lastname, gender, status});
     if (validateResult.error) {
@@ -159,7 +159,20 @@ exports.remove = async (req, res) => {
   }
 }
 
-exports.getAll = async (req, res) => {
+exports.getUser = async (req, res) => {
+  try {
+    const _id = req.body._id || req.query._id || req.headers["_id"];
+    if (_id === undefined || String(_id).trim().length === 0) {
+      throw {message: "User id required!"};
+    }
+    const user = await User.findOne({ _id });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+}
+
+exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
