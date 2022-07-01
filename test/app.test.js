@@ -29,7 +29,7 @@ describe("Register user", () => {
 describe("Login user", () => {
   it("should Login user", async () => {
     const res = await request(app)
-    .post("/api/user/login")
+    .post("/api/login")
     .send({email: 'test@test.com', password: 'password'})
     token = res.body.token;
     userId = res.body._id;
