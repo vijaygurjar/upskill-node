@@ -18,7 +18,7 @@ describe("Register user", () => {
     }
     
     const res = await request(app)
-    .post("/api/user/register")
+    .post("/api/user")
     .send(userData)
     token = res.body.token;
     userId = res.body._id;
@@ -40,7 +40,7 @@ describe("Login user", () => {
 
 describe("Get all users", () => {
   it("should get all users", async () => {
-    const res = await request(app).get("/api/user/all")
+    const res = await request(app).get("/api/users")
     .query({
       token: token
     })
@@ -64,7 +64,7 @@ describe("update user", () => {
       "status": false
     }
     const result = {'message': 'success'};
-    const res = await request(app).put("/api/user/update")
+    const res = await request(app).put("/api/user")
     .send(userData)
     .query({
       _id: userId,
@@ -89,7 +89,7 @@ describe("Get all products", () => {
         "status": true
     }]
     
-    const res = await request(app).get("/api/product/all").query({
+    const res = await request(app).get("/api/products").query({
       token: token
      })
     
@@ -113,7 +113,7 @@ describe("add product", () => {
       status: true
     }
     const result = {'_id': 'unique key'}
-    const res = await request(app).post("/api/product/add")
+    const res = await request(app).post("/api/product")
     .send(productSample)
     .query({
       token: token
@@ -136,7 +136,7 @@ describe("update product", () => {
       status: false
     }
     const result = { "message": "success" }
-    const res = await request(app).put("/api/product/update")
+    const res = await request(app).put("/api/product")
     .send(productSample)
     .query({
       _id: productId,
@@ -156,7 +156,7 @@ describe("Delete product", () => {
     const result = {'message': 'success'}
     
     const res = await request(app)
-    .delete("/api/product/remove")
+    .delete("/api/product")
     .query(productReqData)
     
     expect(res.body).toMatchObject(result)
@@ -172,7 +172,7 @@ describe("Delete user", () => {
     const result = {'message': 'success'}
     
     const res = await request(app)
-    .delete("/api/user/remove")
+    .delete("/api/user")
     .query(userData)
     
     expect(res.body).toMatchObject(result)

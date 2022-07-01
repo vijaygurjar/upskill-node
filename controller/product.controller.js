@@ -63,7 +63,20 @@ exports.remove = async (req, res) => {
   }
 }
 
-exports.getAll = async (req, res) => {
+exports.getProductById = async (req, res) => {
+  try {
+    const _id = req.body._id || req.query._id || req.headers["_id"];
+    if (_id === undefined || String(_id).trim().length === 0) {
+      throw {message: "Product id required!"};
+    }
+    const product = await Product.findOne({ _id });
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+}
+
+exports.getAllProducts = async (req, res) => {
   try {
     const products = await Product.find();
     res.status(200).json(products);

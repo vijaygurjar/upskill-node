@@ -97,32 +97,36 @@ passport.deserializeUser(function(obj, cb) {
   cb(null, obj);
 });
 
-app.post('/api/user/register', userController.register);
+app.post('/api/user', userController.register);
 
 app.post("/api/user/login", userController.login);
 
 app.use(auth);
 
-app.get("/api/user/all", userController.getAll);
+app.get("/api/user", userController.getUser);
+
+app.get("/api/users", userController.getAllUsers);
 
 app.post("/api/user/logout", userController.logout);
 
-app.put("/api/user/update", userController.update);
+app.put("/api/user", userController.update);
 
-app.delete("/api/user/remove", userController.remove);
+app.delete("/api/user", userController.remove);
 
 app.post("/api/user/uploadavtar", s3FileUpload);
 
-app.post('/api/product/add', productController.add);
+app.post('/api/product', productController.add);
 
-app.put("/api/product/update", productController.update);
+app.put("/api/product", productController.update);
 
-app.delete("/api/product/remove", productController.remove);
+app.delete("/api/product", productController.remove);
 
 app.post("/api/product/uploadpic", s3ProductPicUpload);
 
 app.post("/api/product/uploadpics", s3ProductPicsUpload);
 
-app.get("/api/product/all", productController.getAll);
+app.get("/api/product", productController.getProductById);
+
+app.get("/api/products", productController.getAllProducts);
 
 module.exports = app;
