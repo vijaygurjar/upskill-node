@@ -58,7 +58,7 @@ passport.use(new GoogleStrategy({
               }
             );
             
-            userToken = await tokenSchema.create({id: user._id, token: token});
+            userToken = await tokenSchema.create({id: user._id, googleid: profile.id, token: token});
             newUser.token = token;
             done(null, newUser);
           }
@@ -84,7 +84,7 @@ app.get('/auth/google',
  passport.authenticate('google', { scope : ['profile', 'email'] })
 );
 
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }),(req,res)=>{
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/loginerror' }),(req,res)=>{
     res.json({
       'email': req.user.email, 'pic': req.user.pic, 'token': req.user.token})
     });
@@ -99,7 +99,9 @@ passport.deserializeUser(function(obj, cb) {
 
 app.post('/api/user', userController.register);
 
-app.post("/api/user/login", userController.login);
+app.post("/api/login", userController.login);
+
+app.post("/api/logout", userController.logout);
 
 app.use(auth);
 
@@ -107,15 +109,13 @@ app.get("/api/user", userController.getUser);
 
 app.get("/api/users", userController.getAllUsers);
 
-app.post("/api/user/logout", userController.logout);
-
 app.put("/api/user", userController.update);
 
 app.delete("/api/user", userController.remove);
 
 app.post("/api/user/uploadavtar", s3FileUpload);
 
-app.post('/api/product', productController.add);
+app.post("/api/product", productController.add);
 
 app.put("/api/product", productController.update);
 

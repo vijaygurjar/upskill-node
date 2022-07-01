@@ -105,11 +105,11 @@ exports.logout = async (req, res) => {
     if (_id === undefined) {
       throw {message: "User id required!"};
     }
-    const validateResult = logoutValidator.validate(req.body);
+    const validateResult = logoutValidator.validate({_id});
     if (validateResult.error) {
       throw validateResult.error;
     } else {
-        tokenSchema.deleteOne({ _id: _id }, function (err) {
+      tokenSchema.deleteOne({ _id: _id }, function (err) {
         if (!err) {
           res.status(200).send({"message": "success"});
         } else {
