@@ -26,7 +26,7 @@ routes.use(session({
 routes.use(passport.initialize());
 routes.use(passport.session());
 
-app.use(ignoreFavicon);
+routes.use(ignoreFavicon);
 
 routes.use('/api/user', userRoutes);
 
