@@ -26,6 +26,8 @@ routes.use(session({
 routes.use(passport.initialize());
 routes.use(passport.session());
 
+app.use(ignoreFavicon);
+
 routes.use('/api/user', userRoutes);
 
 routes.use('/api/product', productRoutes);
@@ -106,5 +108,12 @@ passport.serializeUser(function (user, cb) {
 passport.deserializeUser(function (obj, cb) {
   cb(null, obj);
 });
+
+function ignoreFavicon(req, res, next) {
+  if (req.originalUrl.includes('favicon.ico')) {
+    res.status(204).end()
+  }
+  next();
+}
 
 module.exports = routes;
