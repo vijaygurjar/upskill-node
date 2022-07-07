@@ -1,7 +1,8 @@
+require("dotenv").config()
+
 const app = require("./routes/routes");
 
-const { API_PORT } = process.env;
-const port = process.env.PORT || API_PORT;
+const port = process.env.API_PORT;
 
 // server listening 
 app.listen(port, () => {
