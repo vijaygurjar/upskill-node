@@ -1,25 +1,25 @@
-const Product = require('../model/product');
+const Product = require('../model/product')
 const productValidator = require('../validator/product.validator');
 
 exports.add = async (req, res) => {
   try {
     const { title, type, description, pic, price, rating, stock, status } = req.body;
     const validateResult = productValidator.validate(req.body);
-    
+
     if (validateResult.error) {
       throw validateResult.error;
     } else {
-        const product = await Product.create({
-          title: title,
-          type: type,
-          description: description,
-          pic: pic,
-          price: price,
-          rating: rating,
-          stock: stock,
-          status: status
-        })
-        res.status(200).json({product: product});
+      const product = await Product.create({
+        title: title,
+        type: type,
+        description: description,
+        pic: pic,
+        price: price,
+        rating: rating,
+        stock: stock,
+        status: status
+      })
+      res.status(200).json({ product: product });
     }
   } catch (err) {
     res.status(400).send(err);
@@ -31,7 +31,7 @@ exports.update = async (req, res) => {
     const { title, type, description, price, rating, stock, status } = req.body;
     const _id = req.body._id || req.query._id || req.headers["_id"];
     if (_id === undefined) {
-      throw {message: "Product id required!"};
+      throw { message: "Product id required!" };
     }
     const validateResult = productValidator.validate({ title, type, description, price, rating, stock, status });
     if (validateResult.error) {
@@ -39,10 +39,10 @@ exports.update = async (req, res) => {
     } else {
       var query = { '_id': _id };
       var newData = { title: title, type: type, description: description, price: price, rating: rating, stock: stock, status: status };
-      
+
       await Product.findOneAndUpdate(query, { $set: newData }, { new: true });
-      
-      res.status(200).json({'message': 'success'});
+
+      res.status(200).json({ 'message': 'success' });
     }
   } catch (error) {
     console.log(error)
@@ -54,32 +54,26 @@ exports.remove = async (req, res) => {
   try {
     const _id = req.body._id || req.query._id || req.headers["_id"];
     if (_id === undefined) {
-      throw {message: "Product id required!"};
+      throw { message: "Product id required!" };
     }
     await Product.deleteOne({ _id: _id });
-    res.status(200).json({'message': 'success'});
+    res.status(200).json({ 'message': 'success' });
   } catch (error) {
     res.status(400).send(error);
   }
 }
 
-exports.getProductById = async (req, res) => {
+exports.getProduct = async (req, res) => {
   try {
     const _id = req.body._id || req.query._id || req.headers["_id"];
-    if (_id === undefined || String(_id).trim().length === 0) {
-      throw {message: "Product id required!"};
+    let result;
+    let resField = {'_id': true, 'title': true, 'type': true, 'description': true, 'price': true, 'rating': true, 'pic': true, 'stock': true, 'status': true, 'images': true}
+    if (_id === undefined) {
+      result = await Product.find({}, resField);
+    } else {
+      result = await Product.findOne({ _id }, resField);
     }
-    const product = await Product.findOne({ _id });
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-}
-
-exports.getAllProducts = async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.status(200).json(products);
+    res.status(200).json(result);
   } catch (error) {
     res.status(400).send(error);
   }

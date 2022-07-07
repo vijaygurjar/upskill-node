@@ -15,7 +15,7 @@ const verifyToken = async (req, res, next) => {
     if (tokenRes === null) {
       throw "Invalid token"
     }
-    
+
     req.user = decoded;
 
   } catch (err) {
