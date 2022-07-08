@@ -1,6 +1,6 @@
 const express = require('express')
 const session = require('express-session')
-const MemoryStore = require('memorystore')(session)
+// const MemoryStore = require('memorystore')(session)
 const db = require('../config/database').connect()
 const passport = require('passport')
 const User = require('../model/user')
@@ -19,10 +19,10 @@ routes.use(express.urlencoded({ extended: true }));
 routes.use(express.json());
 
 routes.use(session({
-  cookie: { maxAge: 86400000 },
-  store: new MemoryStore({
-    checkPeriod: 86400000 // prune expired entries every 24h
-  }),
+  // cookie: { maxAge: 86400000 },
+  // store: new MemoryStore({
+  //   checkPeriod: 86400000 // prune expired entries every 24h
+  // }),
   resave: false,
   saveUninitialized: false,
   secret: 'secret'
