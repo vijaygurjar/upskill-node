@@ -31,18 +31,6 @@ routes.use(session({
 routes.use(passport.initialize());
 routes.use(passport.session());
 
-routes.use(ignoreFavicon);
-
-routes.use('/api/user', userRoutes);
-
-routes.use('/api/product', productRoutes);
-
-routes.post("/api/login", userController.login);
-
-routes.get("/api/googlelogout", userController.googleLogout);
-
-routes.post("/api/logout", userController.logout);
-
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
@@ -114,11 +102,14 @@ passport.deserializeUser(function (obj, cb) {
   cb(null, obj);
 });
 
-function ignoreFavicon(req, res, next) {
-  if (req.originalUrl.includes('favicon.ico')) {
-    res.status(204).end()
-  }
-  next();
-}
+routes.use('/api/user', userRoutes);
+
+routes.use('/api/product', productRoutes);
+
+routes.post("/api/login", userController.login);
+
+routes.get("/api/googlelogout", userController.googleLogout);
+
+routes.post("/api/logout", userController.logout);
 
 module.exports = routes;
