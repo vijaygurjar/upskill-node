@@ -1,5 +1,5 @@
 const express = require('express')
-const session = require('express-session')
+const session = require('cookie-session');
 const db = require('../config/database').connect()
 const passport = require('passport')
 const User = require('../model/user')
@@ -18,13 +18,9 @@ routes.use(express.urlencoded({ extended: true }));
 routes.use(express.json());
 
 routes.use(session({
-  cookie:{
-    secure: true,
-    maxAge:60000
-  },
   resave: false,
   saveUninitialized: false,
-  secret: process.env.SESSION_SECRET
+  secret: 'secret'
 }))
 
 routes.use(passport.initialize());
