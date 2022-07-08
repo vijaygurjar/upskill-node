@@ -76,7 +76,7 @@ routes.get('/loginerror', (req, res) => {
   res.send('error in login')
 })
 
-routes.get('/', function (req, res) {
+routes.get('/google', function (req, res) {
   res.status(301).redirect("/auth/google");
 })
 
