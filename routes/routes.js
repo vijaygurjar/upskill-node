@@ -1,5 +1,5 @@
 const express = require('express')
-const session = require('cookie-session');
+const session = require('express-session')
 const db = require('../config/database').connect()
 const passport = require('passport')
 const User = require('../model/user')
